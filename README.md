@@ -1,3 +1,4 @@
+Forked respository for group 7
 # Project AI for medical image analysis (8P361)
 
 The course consists of two main components: assignments and main project work. The goal of the assignments is for the students to get familiar with the topic of the project and develop a minimal working example that will serve as the basis of the main project work.
