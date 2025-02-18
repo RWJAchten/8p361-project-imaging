@@ -103,37 +103,39 @@ def model_testing(model):
     return score
 
 
-#================================= EXERCISE 1 =====================================
+
 X_train, X_val, X_test, y_train, y_val, y_test = data_preparation()
+
+#================================= EXERCISE 1 =====================================
 
 scores={}
 
-# # 1 hidden layer with 64 neurons and relu, 10 output neurons.
-# model1, tensorboard1=model_training(neuron_architecture=[64, 10], hidden_layer_activation='relu',model_name='64_relu_10')
-# score1=model_testing(model1)
-# scores['model1']=score1
+# 1 hidden layer with 64 neurons and relu, 10 output neurons.
+model1, tensorboard1=model_training(neuron_architecture=[64, 10], hidden_layer_activation='relu',model_name='64_relu_10')
+score1=model_testing(model1)
+scores['model1']=score1
 
-# # 2 hidden layers with 64 and 32 neurons and relu, 10 output neurons.
-# model2, tensorboard2=model_training(neuron_architecture=[64, 32, 10], hidden_layer_activation='relu',model_name='64_32_relu_10')
-# score2=model_testing(model2)
-# scores['model2']=score2
+# 2 hidden layers with 64 and 32 neurons and relu, 10 output neurons.
+model2, tensorboard2=model_training(neuron_architecture=[64, 32, 10], hidden_layer_activation='relu',model_name='64_32_relu_10')
+score2=model_testing(model2)
+scores['model2']=score2
 
-# # 3 hidden layers with 64, 32 and 16 neurons and relu, 10 output neurons.
-# model3, tensorboard3=model_training(neuron_architecture=[64, 32, 16, 10], hidden_layer_activation='relu',model_name='64_32_16_relu_10')
-# score3=model_testing(model3)
-# scores['model3']=score3
-
-# # 3 hidden layers with 64, 64 and 64 neurons and relu, 10 output neurons.
-# model4, tensorboard4=model_training(neuron_architecture=[64, 64, 64, 10], hidden_layer_activation='relu',model_name='64_64_64_relu_10')
-# score4=model_testing(model4)
-# scores['model4']=score4
+# 3 hidden layers with 64, 32 and 16 neurons and relu, 10 output neurons.
+model3, tensorboard3=model_training(neuron_architecture=[64, 32, 16, 10], hidden_layer_activation='relu',model_name='64_32_16_relu_10')
+score3=model_testing(model3)
+scores['model3']=score3
 
 # 3 hidden layers with 64, 64 and 64 neurons and relu, 10 output neurons.
+model4, tensorboard4=model_training(neuron_architecture=[64, 64, 64, 10], hidden_layer_activation='relu',model_name='64_64_64_relu_10')
+score4=model_testing(model4)
+scores['model4']=score4
+
+# 1 hidden layer with 10 neurons and relu, 10 output neurons.
 model5, tensorboard5=model_training(neuron_architecture=[10, 10], hidden_layer_activation='relu',model_name='10_relu_10')
 score5=model_testing(model5)
 scores['model5']=score5
 
-# 3 hidden layers with 64, 64 and 64 neurons and relu, 10 output neurons.
+# 4 hidden layers with 128, 64, 32 and 16 neurons and relu, 10 output neurons.
 model6, tensorboard6=model_training(neuron_architecture=[128,64,32,16,10], hidden_layer_activation='relu',model_name='128_64_32_16_relu_10')
 score6=model_testing(model6)
 scores['model6']=score6
@@ -142,5 +144,15 @@ scores['model6']=score6
 print(scores)
 
 #================================= EXERCISE 2 =====================================
+
+#no hidden layers, 10 output neurons.
+model7, tensorboard7=model_training(neuron_architecture=[10], hidden_layer_activation='relu',model_name='no_hidden_10')
+score7=model_testing(model7)
+scores['model7']=score7
+
+# 3 hidden layers with 64, 32 and 16 neurons and linear activation, 10 output neurons.
+model9, tensorboard9=model_training(neuron_architecture=[64, 32, 16, 10], hidden_layer_activation='linear',model_name='64_32_16_linear_10')
+score9=model_testing(model9)
+scores['model9']=score9
 
 #================================= EXERCISE 3 =====================================
