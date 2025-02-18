@@ -20,7 +20,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Flatten, Dense
 from tensorflow.keras.callbacks import TensorBoard
 
-"""
+
 def data_preparation():
     # load the dataset using the builtin Keras method
     (X_train, y_train), (X_test, y_test) = mnist.load_data()
@@ -65,11 +65,13 @@ def data_preparation():
 
 def model_training(neuron_architecture=[64, 10], hidden_layer_activation='relu',model_name='64_10'):
     
+    """
     Train a model
 
     Args:
     neuron_architecture (list): list with the number of neurons per layer. The last entry is considered as the output layer.
-    
+    """
+
     model = Sequential()
     # flatten the 28x28x1 pixel input images to a row of pixels (a 1D-array)
     model.add(Flatten(input_shape=(28,28,1))) 
@@ -154,10 +156,10 @@ scores['model7']=score7
 model9, tensorboard9=model_training(neuron_architecture=[64, 32, 16, 10], hidden_layer_activation='linear',model_name='64_32_16_linear_10')
 score9=model_testing(model9)
 scores['model9']=score9
-"""
 
 
-#Exercise 3
+
+#================================= EXERCISE 3 =====================================
 # load the dataset using the builtin Keras method
 (X_train, y_train), (X_test, y_test) = mnist.load_data()
 
