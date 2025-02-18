@@ -21,7 +21,7 @@ from tensorflow.keras.layers import Flatten, Dense
 from tensorflow.keras.callbacks import TensorBoard
 
 
-def data_preparation()
+def data_preparation():
     # load the dataset using the builtin Keras method
     (X_train, y_train), (X_test, y_test) = mnist.load_data()
 
@@ -63,7 +63,7 @@ def data_preparation()
 
     return X_train, X_val, X_test, y_train, y_val, y_test
 
-def model_training(neuron_architecture=[64, 10], hidden_layer_activation='relu')
+def model_training(neuron_architecture=[64, 10], hidden_layer_activation='relu',model_name='64_10'):
     """
     Train a model
 
@@ -75,7 +75,7 @@ def model_training(neuron_architecture=[64, 10], hidden_layer_activation='relu')
     model.add(Flatten(input_shape=(28,28,1))) 
     # fully connected layers as specified by neuron_architecture
     for layer in neuron_architecture[:-1]:
-        model.add(Dense(neuron_architecture[layer], activation=hidden_layer_activation))
+        model.add(Dense(layer, activation=hidden_layer_activation))
     # output layer with 10 nodes (one for each class) and softmax nonlinearity
     model.add(Dense(neuron_architecture[-1], activation='softmax')) 
 
@@ -84,7 +84,7 @@ def model_training(neuron_architecture=[64, 10], hidden_layer_activation='relu')
     model.compile(loss='categorical_crossentropy', optimizer='sgd', metrics=['accuracy'])
 
     # use this variable to name your model
-    model_name="my_first_model"
+    model_name=model_name
 
     # create a way to monitor our model in Tensorboard
     tensorboard = TensorBoard("logs/" + model_name)
@@ -94,7 +94,7 @@ def model_training(neuron_architecture=[64, 10], hidden_layer_activation='relu')
 
     return model, tensorboard
 
-def model_testing(model)
+def model_testing(model):
     score = model.evaluate(X_test, y_test, verbose=0)
 
     print("Loss: ",score[0])
@@ -108,22 +108,39 @@ X_train, X_val, X_test, y_train, y_val, y_test = data_preparation()
 
 scores={}
 
-# 1 hidden layer with 64 neurons and relu, 10 output neurons.
-model1, tensorboard1=model_training(neuron_architecture=[64, 10], hidden_layer_activation='relu')
-score1=model_testing(model1)
-scores['model1']=score1
+# # 1 hidden layer with 64 neurons and relu, 10 output neurons.
+# model1, tensorboard1=model_training(neuron_architecture=[64, 10], hidden_layer_activation='relu',model_name='64_relu_10')
+# score1=model_testing(model1)
+# scores['model1']=score1
 
-# 2 hidden layers with 64 and 32 neurons and relu, 10 output neurons.
-model2, tensorboard2=model_training(neuron_architecture=[64, 32, 10], hidden_layer_activation='relu')
-score2=model_testing(model2)
-scores['model2']=score2
+# # 2 hidden layers with 64 and 32 neurons and relu, 10 output neurons.
+# model2, tensorboard2=model_training(neuron_architecture=[64, 32, 10], hidden_layer_activation='relu',model_name='64_32_relu_10')
+# score2=model_testing(model2)
+# scores['model2']=score2
 
-# 3 hidden layers with 64, 32 and 16 neurons and relu, 10 output neurons.
-model3, tensorboard3=model_training(neuron_architecture=[64, 32, 16, 10], hidden_layer_activation='relu')
-score3=model_testing(model3)
-scores['model3']=score3
+# # 3 hidden layers with 64, 32 and 16 neurons and relu, 10 output neurons.
+# model3, tensorboard3=model_training(neuron_architecture=[64, 32, 16, 10], hidden_layer_activation='relu',model_name='64_32_16_relu_10')
+# score3=model_testing(model3)
+# scores['model3']=score3
+
+# # 3 hidden layers with 64, 64 and 64 neurons and relu, 10 output neurons.
+# model4, tensorboard4=model_training(neuron_architecture=[64, 64, 64, 10], hidden_layer_activation='relu',model_name='64_64_64_relu_10')
+# score4=model_testing(model4)
+# scores['model4']=score4
 
 # 3 hidden layers with 64, 64 and 64 neurons and relu, 10 output neurons.
-model4, tensorboard4=model_training(neuron_architecture=[64, 64, 64, 10], hidden_layer_activation='relu')
-score4=model_testing(model4)
-scores['model4']=score4
+model5, tensorboard5=model_training(neuron_architecture=[10, 10], hidden_layer_activation='relu',model_name='10_relu_10')
+score5=model_testing(model5)
+scores['model5']=score5
+
+# 3 hidden layers with 64, 64 and 64 neurons and relu, 10 output neurons.
+model6, tensorboard6=model_training(neuron_architecture=[128,64,32,16,10], hidden_layer_activation='relu',model_name='128_64_32_16_relu_10')
+score6=model_testing(model6)
+scores['model6']=score6
+
+
+print(scores)
+
+#================================= EXERCISE 2 =====================================
+
+#================================= EXERCISE 3 =====================================
