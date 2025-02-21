@@ -65,12 +65,12 @@ def data_preparation():
 
 def model_training(neuron_architecture=[64, 10], hidden_layer_activation='relu',model_name='64_10'):
     
-
+    """
     Train a model
 
     Args:
     neuron_architecture (list): list with the number of neurons per layer. The last entry is considered as the output layer.
-    
+    """
 
     model = Sequential()
     # flatten the 28x28x1 pixel input images to a row of pixels (a 1D-array)
