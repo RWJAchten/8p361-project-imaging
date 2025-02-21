@@ -20,7 +20,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Flatten, Dense
 from tensorflow.keras.callbacks import TensorBoard
 
-"""
+
 def data_preparation():
     # load the dataset using the builtin Keras method
     (X_train, y_train), (X_test, y_test) = mnist.load_data()
@@ -157,7 +157,7 @@ model9, tensorboard9=model_training(neuron_architecture=[64, 32, 16, 10], hidden
 score9=model_testing(model9)
 scores['model9']=score9
 
-"""
+
 
 #================================= EXERCISE 3 =====================================
 # load the dataset using the builtin Keras method
