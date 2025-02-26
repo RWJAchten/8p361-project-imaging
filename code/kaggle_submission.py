@@ -17,7 +17,7 @@ from matplotlib.pyplot import imread
 from tensorflow.keras.models import model_from_json
 
 #Change these variables to point at the locations and names of the test dataset and your models.
-TEST_PATH = 'Users/20223692/OneDrive - TU Eindhoven/Documents/GitHub/8p361-project-imaging' 
+TEST_PATH = r'C:\Users\20223692\OneDrive - TU Eindhoven\data\test'
 MODEL_FILEPATH = r'C:\Users\20223692\OneDrive - TU Eindhoven\Documents\GitHub\8p361-project-imaging\assignments\my_second_cnn_model.json'
 MODEL_WEIGHTS_FILEPATH = r'C:\Users\20223692\OneDrive - TU Eindhoven\Documents\GitHub\8p361-project-imaging\assignments\my_second_cnn_model_weights.hdf5'
 #'C:/Datasets/test/'
