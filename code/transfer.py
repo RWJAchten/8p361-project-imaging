@@ -59,7 +59,7 @@ pretrained = MobileNetV2(input_shape=input_shape, include_top=False, weights='im
 
 output = pretrained(input)
 output = GlobalAveragePooling2D()(output)
-output = Dropout(0.5)(output)
+# output = Dropout(0.5)(output)
 output = Dense(1, activation='sigmoid')(output)
 
 model = Model(input, output)
@@ -71,11 +71,19 @@ model.compile(SGD(learning_rate=0.001, momentum=0.95), loss = 'binary_crossentro
 model.summary()
 
 # get the data generators
+<<<<<<< Updated upstream
 train_gen, val_gen = get_pcam_generators(r"C:\Users\20223692\OneDrive - TU Eindhoven\data")
+=======
+<<<<<<< HEAD
+train_gen, val_gen = get_pcam_generators('C:\\Users\\20223842\\OneDrive - TU Eindhoven\\Documents\\2024-2025\\project imaging')
+=======
+train_gen, val_gen = get_pcam_generators(r"C:\Users\20223692\OneDrive - TU Eindhoven\data")
+>>>>>>> 8f161e3d30df35a32ec8daf10540fe8e21fec028
+>>>>>>> Stashed changes
 
 
 # save the model and weights
-model_name = 'my_first_transfer_model'
+model_name = 'transfer_model_without_dropout'
 model_filepath = model_name + '.json'
 weights_filepath = model_name + '_weights.hdf5'
 
@@ -101,3 +109,26 @@ history = model.fit(train_gen, steps_per_epoch=train_steps,
                     validation_steps=val_steps,
                     epochs=10,
                     callbacks=callbacks_list)
+
+# Exercise 2
+from sklearn.metrics import roc_curve, auc
+import matplotlib.pyplot as plt
+ 
+y_pred_prob = model.predict(val_gen)
+y_true = val_gen.classes
+
+# Bepaal de ROC-curve
+fpr, tpr, thresholds = roc_curve(y_true, y_pred_prob)
+roc_auc = auc(fpr, tpr)
+ 
+# Plot de ROC-curve
+plt.figure()
+plt.plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
+plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Receiver Operating Characteristic')
+plt.legend(loc="lower right")
+plt.show()
