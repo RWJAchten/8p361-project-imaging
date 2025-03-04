@@ -29,8 +29,8 @@ IMAGE_SIZE = 96
 def get_pcam_generators(base_dir, train_batch_size=32, val_batch_size=32):
 
      # dataset parameters
-     train_path = os.path.join(base_dir, 'train+val', 'train')
-     valid_path = os.path.join(base_dir, 'train+val', 'valid')
+     train_path = os.path.join(base_dir, 'train+val','train')
+     valid_path = os.path.join(base_dir, 'train+val','valid')
 
 
      RESCALING_FACTOR = 1./255
@@ -78,14 +78,14 @@ model = get_model()
 
 
 # get the data generators
-train_gen, val_gen = get_pcam_generators('/change/me/to/dataset/path')
+train_gen, val_gen = get_pcam_generators('Data') # change this to the path of your data directory
 
 
 
 # save the model and weights
 model_name = 'my_first_cnn_model'
 model_filepath = model_name + '.json'
-weights_filepath = model_name + '_weights.hdf5'
+weights_filepath = model_name + '_weights.keras'
 
 model_json = model.to_json() # serialize model to JSON
 with open(model_filepath, 'w') as json_file:

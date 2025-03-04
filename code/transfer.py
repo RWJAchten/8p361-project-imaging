@@ -49,86 +49,59 @@ input_shape = (IMAGE_SIZE, IMAGE_SIZE, 3)
 
 input = Input(input_shape)
 
-# get the pretrained model, cut out the top layer
-pretrained = MobileNetV2(input_shape=input_shape, include_top=False, weights='imagenet')
+def train_pretrained_model_for_exercise2(weights='imagenet',model_name='transfer_model_without_dropout'):
+    # get the pretrained model, cut out the top layer
+    pretrained = MobileNetV2(input_shape=input_shape, include_top=False, weights=weights)
 
-# if the pretrained model it to be used as a feature extractor, and not for
-# fine-tuning, the weights of the model can be frozen in the following way
-# for layer in pretrained.layers:
-#    layer.trainable = False
+    output = pretrained(input)
+    output = GlobalAveragePooling2D()(output)
+    # output = Dropout(0.5)(output)
+    output = Dense(1, activation='sigmoid')(output)
 
-output = pretrained(input)
-output = GlobalAveragePooling2D()(output)
-# output = Dropout(0.5)(output)
-output = Dense(1, activation='sigmoid')(output)
+    model = Model(input, output)
 
-model = Model(input, output)
+    # note the lower lr compared to the cnn example
+    model.compile(SGD(learning_rate=0.001, momentum=0.95), loss = 'binary_crossentropy', metrics=['accuracy'])
 
-# note the lower lr compared to the cnn example
-model.compile(SGD(learning_rate=0.001, momentum=0.95), loss = 'binary_crossentropy', metrics=['accuracy'])
+    # print a summary of the model on screen
+    model.summary()
 
-# print a summary of the model on screen
-model.summary()
-
-# get the data generators
-<<<<<<< Updated upstream
-train_gen, val_gen = get_pcam_generators(r"C:\Users\20223692\OneDrive - TU Eindhoven\data")
-=======
-<<<<<<< HEAD
-train_gen, val_gen = get_pcam_generators('C:\\Users\\20223842\\OneDrive - TU Eindhoven\\Documents\\2024-2025\\project imaging')
-=======
-train_gen, val_gen = get_pcam_generators(r"C:\Users\20223692\OneDrive - TU Eindhoven\data")
->>>>>>> 8f161e3d30df35a32ec8daf10540fe8e21fec028
->>>>>>> Stashed changes
+    # get the data generators
+    train_gen, val_gen = get_pcam_generators('Data') # change this path to the path of your data directory
 
 
-# save the model and weights
-model_name = 'transfer_model_without_dropout'
-model_filepath = model_name + '.json'
-weights_filepath = model_name + '_weights.hdf5'
+    # save the model and weights
+    model_filepath = 'metadata/'+model_name + '.json'
+    weights_filepath = 'metadata/'+model_name + '_weights.keras'
 
-model_json = model.to_json() # serialize model to JSON
-with open(model_filepath, 'w') as json_file:
-    json_file.write(model_json)
-
-
-# define the model checkpoint and Tensorboard callbacks
-checkpoint = ModelCheckpoint(weights_filepath, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
-tensorboard = TensorBoard(os.path.join('logs', model_name))
-callbacks_list = [checkpoint, tensorboard]
+    model_json = model.to_json() # serialize model to JSON
+    with open(model_filepath, 'w') as json_file:
+        json_file.write(model_json)
 
 
-# train the model, note that we define "mini-epochs"
-train_steps = train_gen.n//train_gen.batch_size//20
-val_steps = val_gen.n//val_gen.batch_size//20
+    # define the model checkpoint and Tensorboard callbacks
+    checkpoint = ModelCheckpoint(weights_filepath, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
+    tensorboard = TensorBoard(os.path.join('logs', model_name))
+    callbacks_list = [checkpoint, tensorboard]
 
-# since the model is trained for only 10 "mini-epochs", i.e. half of the data is
-# not used during training
-history = model.fit(train_gen, steps_per_epoch=train_steps,
-                    validation_data=val_gen,
-                    validation_steps=val_steps,
-                    epochs=10,
-                    callbacks=callbacks_list)
 
-# Exercise 2
-from sklearn.metrics import roc_curve, auc
-import matplotlib.pyplot as plt
- 
-y_pred_prob = model.predict(val_gen)
-y_true = val_gen.classes
+    # train the model, note that we define "mini-epochs"
+    train_steps = train_gen.n//train_gen.batch_size//20
+    val_steps = val_gen.n//val_gen.batch_size//20
 
-# Bepaal de ROC-curve
-fpr, tpr, thresholds = roc_curve(y_true, y_pred_prob)
-roc_auc = auc(fpr, tpr)
- 
-# Plot de ROC-curve
-plt.figure()
-plt.plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
-plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
-plt.xlim([0.0, 1.0])
-plt.ylim([0.0, 1.05])
-plt.xlabel('False Positive Rate')
-plt.ylabel('True Positive Rate')
-plt.title('Receiver Operating Characteristic')
-plt.legend(loc="lower right")
-plt.show()
+    # since the model is trained for only 10 "mini-epochs", i.e. half of the data is
+    # not used during training
+    history = model.fit(train_gen, steps_per_epoch=train_steps,
+                        validation_data=val_gen,
+                        validation_steps=val_steps,
+                        epochs=10,
+                        callbacks=callbacks_list)
+    
+    return model, val_gen
+
+#=============== Exercise 2 ==================
+
+# train the transfer model once with initial weights from imagenet and once without initial weights
+
+model_imagenet, val_gen_imagenet=train_pretrained_model_for_exercise2(weights='imagenet',model_name='transfer_model_without_dropout')
+model_none, val_gen_none=train_pretrained_model_for_exercise2(weights=None,model_name='transfer_model_without_dropout_without_initial_weights')
