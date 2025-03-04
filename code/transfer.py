@@ -71,15 +71,13 @@ model.compile(SGD(learning_rate=0.001, momentum=0.95), loss = 'binary_crossentro
 model.summary()
 
 # get the data generators
-<<<<<<< Updated upstream
+
 train_gen, val_gen = get_pcam_generators(r"C:\Users\20223692\OneDrive - TU Eindhoven\data")
-=======
-<<<<<<< HEAD
+
 train_gen, val_gen = get_pcam_generators('C:\\Users\\20223842\\OneDrive - TU Eindhoven\\Documents\\2024-2025\\project imaging')
-=======
+
 train_gen, val_gen = get_pcam_generators(r"C:\Users\20223692\OneDrive - TU Eindhoven\data")
->>>>>>> 8f161e3d30df35a32ec8daf10540fe8e21fec028
->>>>>>> Stashed changes
+
 
 
 # save the model and weights
