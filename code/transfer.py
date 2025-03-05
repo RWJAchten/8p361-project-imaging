@@ -11,6 +11,7 @@ import tensorflow as tf
 
 
 import numpy as np
+import matplotlib.pyplot as plt
 
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.models import Model
@@ -49,14 +50,17 @@ input_shape = (IMAGE_SIZE, IMAGE_SIZE, 3)
 
 input = Input(input_shape)
 
-def train_pretrained_model_for_exercise2(weights='imagenet',model_name='transfer_model_without_dropout'):
+def train_pretrained_model_for_exercise2(weights='imagenet',model_name='transfer_model_without_dropout',Dropout_condition = False):
     # get the pretrained model, cut out the top layer
     pretrained = MobileNetV2(input_shape=input_shape, include_top=False, weights=weights)
 
     output = pretrained(input)
     output = GlobalAveragePooling2D()(output)
-    # output = Dropout(0.5)(output)
-    output = Dense(1, activation='sigmoid')(output)
+    if Dropout_condition == False:
+        output = Dropout(0.5)(output)
+        output = Dense(1, activation='sigmoid')(output)
+    else:
+        output = Dense(1, activation='sigmoid')(output)
 
     model = Model(input, output)
 
@@ -97,11 +101,40 @@ def train_pretrained_model_for_exercise2(weights='imagenet',model_name='transfer
                         epochs=10,
                         callbacks=callbacks_list)
     
-    return model, val_gen
+    return model, val_gen, history
 
 #=============== Exercise 2 ==================
 
 # train the transfer model once with initial weights from imagenet and once without initial weights
 
-model_imagenet, val_gen_imagenet=train_pretrained_model_for_exercise2(weights='imagenet',model_name='transfer_model_without_dropout')
-model_none, val_gen_none=train_pretrained_model_for_exercise2(weights=None,model_name='transfer_model_without_dropout_without_initial_weights')
+model_imagenet, val_gen_imagenet, history_imagenet=train_pretrained_model_for_exercise2(weights='imagenet',model_name='transfer_model_without_dropout')
+model_none, val_gen_none, history_none=train_pretrained_model_for_exercise2(weights=None,model_name='transfer_model_without_dropout_without_initial_weights')
+model_dropout, val_gen_none, history_dropout=train_pretrained_model_for_exercise2(weights='imagenet',model_name='transfer_model_with_dropout_with_intial_weights', Dropout_condition = True)
+
+def plot_history(history, title='Training History'):
+    plt.figure(figsize=(12, 5))
+
+    # Accuracy
+    plt.subplot(1, 2, 1)
+    plt.plot(history.history['accuracy'], label='Train Accuracy')
+    plt.plot(history.history['val_accuracy'], label='Val Accuracy')
+    plt.title(f'{title} - Accuracy')
+    plt.xlabel('Epochs')
+    plt.ylabel('Accuracy')
+    plt.legend()
+
+    # Loss
+    plt.subplot(1, 2, 2)
+    plt.plot(history.history['loss'], label='Train Loss')
+    plt.plot(history.history['val_loss'], label='Val Loss')
+    plt.title(f'{title} - Loss')
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
+    plt.legend()
+
+    plt.show()
+
+# Plot each model's history
+plot_history(history_imagenet, title='Without Dropout (Imagenet Weights)')
+plot_history(history_none, title='Without Dropout (No Initial Weights)')
+plot_history(history_dropout, title='With Dropout (Imagenet Weights)')
