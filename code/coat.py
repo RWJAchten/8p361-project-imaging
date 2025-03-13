@@ -1,5 +1,6 @@
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'}   
+os.chdir('D:\TUE\AI_in_MIA\8p361-project-imaging')
 import tensorflow as tf
 
 import numpy as np
@@ -24,8 +25,8 @@ IMAGE_SIZE = 96
 def get_pcam_generators(base_dir, train_batch_size=32, val_batch_size=32):
 
      # dataset parameters
-     train_path = os.path.join(base_dir, 'train+val','train')
-     valid_path = os.path.join(base_dir, 'train+val','valid')
+     train_path = os.path.join(base_dir,'train')
+     valid_path = os.path.join(base_dir,'valid')
 
 
      RESCALING_FACTOR = 1./255
@@ -103,7 +104,7 @@ with open(model_filepath, 'w') as json_file:
 
 
 # get the data generators
-train_gen, val_gen = get_pcam_generators('/Users/20223692/OneDrive - TU Eindhoven/data')
+train_gen, val_gen = get_pcam_generators('Data')
 
 
 # define the model checkpoint and Tensorboard callbacks
