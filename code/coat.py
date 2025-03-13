@@ -10,6 +10,8 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Dense, Flatten
 from tensorflow.keras.layers import Conv2D, MaxPool2D, GlobalAveragePooling1D
 from tensorflow.keras.layers import Input
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Flatten
 from tensorflow.keras.layers import Dropout
 from tensorflow.keras.layers import LayerNormalization
 from tensorflow.keras.layers import BatchNormalization
@@ -83,7 +85,7 @@ def CoAtNet(input_shape, num_classes=2):
     
     x = GlobalAveragePooling1D()(x)
     outputs = Dense(1, activation="sigmoid")(x)
-    
+
     return Model(inputs, outputs)
 
 
@@ -114,7 +116,7 @@ callbacks_list = [checkpoint, tensorboard]
 
 
 # since the model is trained for only 10 "mini-epochs", i.e. half of the data is
-    # not used during training
+# not used during training
 train_steps = train_gen.n//train_gen.batch_size
 val_steps = val_gen.n//val_gen.batch_size
 history = model.fit(train_gen, steps_per_epoch=train_steps,
