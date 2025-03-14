@@ -138,3 +138,4 @@ def plot_history(history, title='Training History'):
 plot_history(history_imagenet, title='Without Dropout (Imagenet Weights)')
 plot_history(history_none, title='Without Dropout (No Initial Weights)')
 plot_history(history_dropout, title='With Dropout (Imagenet Weights)')
+
