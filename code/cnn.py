@@ -23,11 +23,27 @@ from tensorflow.keras.callbacks import ModelCheckpoint, TensorBoard
 from sklearn.metrics import roc_curve, auc
 
 
+# assuming this file is in the 'code' directory, which is in the same folder as the 'Data' directory:
+
+
+#         |---- code-- cnn.py
+# parent--|                       |-- train
+#         |---- Data-- train+val--|
+#         |                       |-- validation
+#         |---- logs
+#         |
+#         |---- metadata
+
+# either open the parent directory directly of use following line to change the os path to parent from this file:
+# os.chdir('..')
+
+dir=os.getcwd()
+
 # the size of the images in the PCAM dataset
 IMAGE_SIZE = 96
 
 
-def get_pcam_generators(base_dir, train_batch_size=32, val_batch_size=32):
+def get_pcam_generators(base_dir, train_batch_size=100, val_batch_size=32):
 
      # dataset parameters
      train_path = os.path.join(base_dir, 'train+val','train')
@@ -79,21 +95,22 @@ model_exercise_1 = get_model_exercise_1()
 
 
 # get the data generators
-train_gen, val_gen = get_pcam_generators('C://Users//20223842//OneDrive - TU Eindhoven//Documents//2024-2025//project imaging') # change this to the path of your data directory
+train_gen, val_gen = get_pcam_generators(dir+'/Data') # change this to the path of your data directory
 
 
 
-# save the model and weights
-model_name = 'my_first_cnn_model'
-model_filepath = model_name + '.json'
-weights_filepath = model_name + '_weights.keras'
+# save the model and weights to the folder 'metadata'
+model_name='CNN_model'
+model_filepath = 'metadata/'+model_name + '.json'
+weights_filepath = 'metadata/'+model_name + '_weights.keras'
+weights_filepath = 'metadata/'+model_name + '_weights.keras'
 
 model_json = model_exercise_1.to_json() # serialize model to JSON
 with open(model_filepath, 'w') as json_file:
     json_file.write(model_json)
 
 
-# define the model checkpoint and Tensorboard callbacks
+# define the model checkpoint and Tensorboard callbacks to directory 'logs'
 checkpoint = ModelCheckpoint(weights_filepath, monitor='val_loss', verbose=1, save_best_only=True, mode='min')
 tensorboard = TensorBoard(os.path.join('logs', model_name))
 callbacks_list = [checkpoint, tensorboard]
@@ -106,12 +123,11 @@ val_steps = val_gen.n//val_gen.batch_size
 history = model_exercise_1.fit(train_gen, steps_per_epoch=train_steps,
                     validation_data=val_gen,
                     validation_steps=val_steps,
-                    epochs=3,
+                    epochs=1,
                     callbacks=callbacks_list)
 
-# ROC analysis
 
-# TODO Perform ROC analysis on the validation set
+# ROC analysis
 y_pred_prob = model_exercise_1.predict(val_gen)  # Returns a probability per image
 y_true = val_gen.classes  # The real labels (0 or 1) from the validation set
 
