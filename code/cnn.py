@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Flatten
-from tensorflow.keras.layers import Conv2D, MaxPool2D
+from tensorflow.keras.layers import Conv2D, MaxPool2D, GlobalAveragePooling2D
 from tensorflow.keras.optimizers import SGD
 from tensorflow.keras.callbacks import ModelCheckpoint, TensorBoard
 
@@ -89,13 +89,39 @@ def get_model_exercise_1(kernel_size=(3,3), pool_size=(4,4), first_filters=32, s
 
      return first_model
 
-
 # get the model
 model_exercise_1 = get_model_exercise_1()
 
+def get_model_covolutional(kernel_size=(3,3), pool_size=(4,4), first_filters=32, second_filters=64, third_filters=128, fourth_filters=264):
+
+     # build the model
+     model_convolutional = Sequential()
+
+     model_convolutional.add(Conv2D(first_filters, kernel_size, activation = 'relu', padding = 'same', input_shape = (IMAGE_SIZE, IMAGE_SIZE, 3)))
+     model_convolutional.add(MaxPool2D(pool_size = pool_size))
+
+     model_convolutional.add(Conv2D(second_filters, kernel_size, activation = 'relu', padding = 'same'))
+     model_convolutional.add(MaxPool2D(pool_size = pool_size))
+
+     model_convolutional.add(Conv2D(third_filters, kernel_size, activation = 'relu', padding = 'same'))
+     model_convolutional.add(MaxPool2D(pool_size = pool_size))
+     
+     # Fully convolutional replacement for Dense layer
+     model_convolutional.add(Conv2D(1, (1,1), activation='sigmoid'))  # 1x1 conv acts like a dense layer
+     model_convolutional.add(GlobalAveragePooling2D())  # Averages over all spatial locations
+
+     # compile the model
+     model_convolutional.compile(SGD(learning_rate=0.01, momentum=0.95), loss = 'binary_crossentropy', metrics=['accuracy'])
+
+     return model_convolutional
+
+# get the model
+model_convolutional = get_model_covolutional()
+
+
 
 # get the data generators
-train_gen, val_gen = get_pcam_generators(dir+'/Data') # change this to the path of your data directory if it does not follow abovementioned structure.
+train_gen, val_gen = get_pcam_generators( dir+'/Data') # change this to the path of your data directory if it does not follow abovementioned structure.
 
 
 
@@ -129,27 +155,45 @@ history = model_exercise_1.fit(train_gen, steps_per_epoch=train_steps,
 # for plots in a seperate window use:
 # %matplotlib qt
 
+
+def plot_roc_curve(y_true, y_pred_prob):
+    """
+    This function computes the ROC curve and plots it.
+
+    Parameters:
+    - y_true: The true labels (0 or 1) of the dataset.
+    - y_pred_prob: The predicted probabilities for each image.
+
+    Returns:
+    - The AUC (Area Under Curve) score.
+    """
+    # Compute the ROC curve
+    fpr, tpr, thresholds = roc_curve(y_true, y_pred_prob)
+    
+    # Compute the AUC
+    roc_auc = auc(fpr, tpr)
+    
+    # Plot the ROC curve
+    plt.figure()
+    plt.plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
+    plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title('Receiver Operating Characteristic')
+    plt.legend(loc="lower right")
+    plt.show()
+    
+    # Return the AUC value
+    return roc_auc
+
 # ROC analysis
-y_pred_prob = model_exercise_1.predict(val_gen)  # Returns a probability per image
+y_pred_prob = model_exercise_1.predict(val_gen)  # Returns a probability per image from the model that you select, if you want to use another model, you should change "model_exercise_1" to the model you want to use
 y_true = val_gen.classes  # The real labels (0 or 1) from the validation set
+plot_roc_curve(y_true, y_pred_prob)
 
-# Determine the ROC curve
-fpr, tpr, thresholds = roc_curve(y_true, y_pred_prob)
-roc_auc = auc(fpr, tpr)
- 
-# Plot the ROC curve
-plt.figure()
-plt.plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
-plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
-plt.xlim([0.0, 1.0])
-plt.ylim([0.0, 1.05])
-plt.xlabel('False Positive Rate')
-plt.ylabel('True Positive Rate')
-plt.title('Receiver Operating Characteristic')
-plt.legend(loc="lower right")
-plt.show()
 
-print(history.history['accuracy'])
 
 def plot_history(history, title='Training History'):
     plt.figure(figsize=(12, 5))
