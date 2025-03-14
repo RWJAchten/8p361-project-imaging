@@ -123,7 +123,7 @@ val_steps = val_gen.n//val_gen.batch_size
 history = model_exercise_1.fit(train_gen, steps_per_epoch=train_steps,
                     validation_data=val_gen,
                     validation_steps=val_steps,
-                    epochs=1,
+                    epochs=3,
                     callbacks=callbacks_list)
 
 # for plots in a seperate window use:
