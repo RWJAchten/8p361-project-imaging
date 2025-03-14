@@ -146,7 +146,7 @@ callbacks_list = [checkpoint, tensorboard]
 train_steps = train_gen.n//train_gen.batch_size
 val_steps = val_gen.n//val_gen.batch_size
 
-# get the history of the model you want to use, if you want to get the history of the model only using convolutional layers, change 'model_exercise_1' for 'model_convolutiona'
+# get the history of the model you want to use, if you want to get the history of the model only using convolutional layers, change 'model_exercise_1' to 'model_convolutiona'
 history = model_exercise_1.fit(train_gen, steps_per_epoch=train_steps,
                     validation_data=val_gen,
                     validation_steps=val_steps,
