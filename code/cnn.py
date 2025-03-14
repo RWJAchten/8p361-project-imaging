@@ -119,6 +119,9 @@ def get_model_covolutional(kernel_size=(3,3), pool_size=(4,4), first_filters=32,
 model_convolutional = get_model_covolutional()
 
 
+# training of the model. Change this to the type of model you want to train.
+model=model_exercise_1 # or model_convolutional
+
 
 # get the data generators
 train_gen, val_gen = get_pcam_generators( dir+'/Data') # change this to the path of your data directory if it does not follow abovementioned structure.
@@ -131,7 +134,7 @@ model_filepath = 'metadata/'+model_name + '.json'
 weights_filepath = 'metadata/'+model_name + '_weights.keras'
 
 
-model_json = model_exercise_1.to_json() # serialize model to JSON
+model_json = model.to_json() # serialize model to JSON
 with open(model_filepath, 'w') as json_file:
     json_file.write(model_json)
 
@@ -147,7 +150,7 @@ train_steps = train_gen.n//train_gen.batch_size
 val_steps = val_gen.n//val_gen.batch_size
 
 # get the history of the model you want to use, if you want to get the history of the model only using convolutional layers, change 'model_exercise_1' to 'model_convolutiona'
-history = model_exercise_1.fit(train_gen, steps_per_epoch=train_steps,
+history = model.fit(train_gen, steps_per_epoch=train_steps,
                     validation_data=val_gen,
                     validation_steps=val_steps,
                     epochs=3,
@@ -188,7 +191,7 @@ def plot_roc_curve(y_true, y_pred_prob):
     return roc_auc
 
 # ROC analysis
-y_pred_prob = model_exercise_1.predict(val_gen)  # Returns a probability per image from the model that you select, if you want to use another model, you should change "model_exercise_1" to the model you want to use
+y_pred_prob = model.predict(val_gen)  # Returns a probability per image from the model that you select, if you want to use another model, you should change "model_exercise_1" to the model you want to use
 y_true = val_gen.classes  # The real labels (0 or 1) from the validation set
 plot_roc_curve(y_true, y_pred_prob)
 
