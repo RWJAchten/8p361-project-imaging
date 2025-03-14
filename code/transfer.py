@@ -20,6 +20,22 @@ from tensorflow.keras.optimizers import SGD
 from tensorflow.keras.callbacks import ModelCheckpoint, TensorBoard
 from tensorflow.keras.applications.mobilenet_v2 import MobileNetV2, preprocess_input
 
+# assuming this file is in the 'code' directory, which is in the same folder as the 'Data' directory:
+
+
+#         |---- code-- cnn.py
+# parent--|                       |-- train
+#         |---- Data-- train+val--|
+#         |                       |-- validation
+#         |---- logs
+#         |
+#         |---- metadata
+
+# either open the parent directory directly of use following line to change the os path to parent from this file:
+# os.chdir('..')
+
+dir=os.getcwd()
+
 
 def get_pcam_generators(base_dir, train_batch_size=32, val_batch_size=32):
 
@@ -71,7 +87,7 @@ def train_pretrained_model_for_exercise2(weights='imagenet',model_name='transfer
     model.summary()
 
     # get the data generators
-    train_gen, val_gen = get_pcam_generators('Data') # change this path to the path of your data directory
+    train_gen, val_gen = get_pcam_generators('../Data') # change this path to the path of your data directory
 
 
     # save the model and weights
@@ -105,7 +121,7 @@ def train_pretrained_model_for_exercise2(weights='imagenet',model_name='transfer
 
 #=============== Exercise 2 ==================
 
-# train the transfer model once with initial weights from imagenet and once without initial weights
+# train the transfer model once with initial weights from imagenet, once without initial weights and once without a dropout layer.
 
 model_imagenet, val_gen_imagenet, history_imagenet=train_pretrained_model_for_exercise2(weights='imagenet',model_name='transfer_model_without_dropout')
 model_none, val_gen_none, history_none=train_pretrained_model_for_exercise2(weights=None,model_name='transfer_model_without_dropout_without_initial_weights')

@@ -95,7 +95,7 @@ model_exercise_1 = get_model_exercise_1()
 
 
 # get the data generators
-train_gen, val_gen = get_pcam_generators(dir+'/Data') # change this to the path of your data directory
+train_gen, val_gen = get_pcam_generators(dir+'/Data') # change this to the path of your data directory if it does not follow abovementioned structure.
 
 
 
@@ -126,6 +126,8 @@ history = model_exercise_1.fit(train_gen, steps_per_epoch=train_steps,
                     epochs=1,
                     callbacks=callbacks_list)
 
+# for plots in a seperate window use:
+# %matplotlib qt
 
 # ROC analysis
 y_pred_prob = model_exercise_1.predict(val_gen)  # Returns a probability per image
