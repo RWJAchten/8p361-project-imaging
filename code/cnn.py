@@ -129,7 +129,7 @@ train_gen, val_gen = get_pcam_generators( dir+'/Data') # change this to the path
 model_name='CNN_model'
 model_filepath = 'metadata/'+model_name + '.json'
 weights_filepath = 'metadata/'+model_name + '_weights.keras'
-weights_filepath = 'metadata/'+model_name + '_weights.keras'
+
 
 model_json = model_exercise_1.to_json() # serialize model to JSON
 with open(model_filepath, 'w') as json_file:
@@ -146,14 +146,13 @@ callbacks_list = [checkpoint, tensorboard]
 train_steps = train_gen.n//train_gen.batch_size
 val_steps = val_gen.n//val_gen.batch_size
 
+# get the history of the model you want to use, if you want to get the history of the model only using convolutional layers, change 'model_exercise_1' for 'model_convolutiona'
 history = model_exercise_1.fit(train_gen, steps_per_epoch=train_steps,
                     validation_data=val_gen,
                     validation_steps=val_steps,
                     epochs=3,
                     callbacks=callbacks_list)
 
-# for plots in a seperate window use:
-# %matplotlib qt
 
 
 def plot_roc_curve(y_true, y_pred_prob):
@@ -218,4 +217,4 @@ def plot_history(history, title='Training History'):
 
     plt.show()
 
-plot_history(history, title = 'CNN model only using convolutional layers')
+plot_history(history, title = 'CNN model only using convolutional layers') # change the "history" to the correct history you want to plot
