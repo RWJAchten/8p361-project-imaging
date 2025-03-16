@@ -50,37 +50,43 @@ def convolutional_block(input, kernel_size=(3,3), first_filters=32):
 
 
 def transformer_block(x, embed_dim, num_heads=8, ff_dim=256, dropout_rate=0.1):
+    # Pre-normalization
     x = LayerNormalization(epsilon = 1e-6)(x) #Nienke
     x = Dense(embed_dim)(x)
     
+    #Multi-head attention layer
     attn_output = MultiHeadAttention(num_heads=num_heads, key_dim=embed_dim)(x, x)
-    attn_output = Dropout(dropout_rate)(attn_output)
+    attn_output = Dropout(dropout_rate)(attn_output) # dropout to prevent overfitting
+
+    # Post-normalization
     x = LayerNormalization(epsilon=1e-6)(x + attn_output)  
     
+    # Feed-forward network
     ffn_output = tf.keras.Sequential([
-        Dense(ff_dim, activation="gelu"),
-        Dense(embed_dim)
+        Dense(ff_dim, activation="gelu"), # expands feature dimension and introduces non-linearity (to recognize complex patterns)
+        Dense(embed_dim) # projects back to original size
     ])(x)
-    
-    ffn_output = Dropout(dropout_rate)(ffn_output)
+    ffn_output = Dropout(dropout_rate)(ffn_output) # dropout for generalization
+
     return LayerNormalization(epsilon=1e-6)(x + ffn_output)
 
 
-def CoAtNet(input_shape, num_classes=2):
+def CoAtNet(input_shape, num_classes=1):
     inputs = Input(shape=input_shape)
     
     # 2x CNN block
     x = convolutional_block(inputs, 32) 
     x = convolutional_block(x, 64)
     
-    x = Reshape((IMAGE_SIZE * IMAGE_SIZE, 64))(x)  
+   # Automatic reshaping
+    x = Reshape((-1, x.shape[-1]))(x)  
     # 2x transformer block
     x = transformer_block(x, embed_dim=64, num_heads=4)
     x = transformer_block(x, embed_dim=64, num_heads=4)
     
     x = GlobalAveragePooling1D()(x)
-    outputs = Dense(1, activation="sigmoid")(x)
-
+    outputs = Dense(num_classes, activation="sigmoid")(x)
+    
     return Model(inputs, outputs)
 
 def convolutional_block_hybrid(x, filters):
