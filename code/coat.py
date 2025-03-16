@@ -1,6 +1,5 @@
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'}   
-os.chdir('D:\TUE\AI_in_MIA\8p361-project-imaging')
 import tensorflow as tf
 
 import numpy as np
@@ -8,7 +7,7 @@ import numpy as np
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Dense, Flatten
-from tensorflow.keras.layers import Conv2D, MaxPool2D, GlobalAveragePooling1D
+from tensorflow.keras.layers import Conv2D, MaxPool2D, GlobalAveragePooling1D, DepthwiseConv2D
 from tensorflow.keras.layers import Input
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Flatten
@@ -23,12 +22,13 @@ from tensorflow.keras.callbacks import ModelCheckpoint, TensorBoard
 
 IMAGE_SIZE = 96
 
+dir=os.getcwd()
 
 def get_pcam_generators(base_dir, train_batch_size=32, val_batch_size=32):
 
      # dataset parameters
-     train_path = os.path.join(base_dir,'train')
-     valid_path = os.path.join(base_dir,'valid')
+     train_path = os.path.join(base_dir,'train+val','train')
+     valid_path = os.path.join(base_dir,'train+val','valid')
 
 
      RESCALING_FACTOR = 1./255
@@ -51,8 +51,15 @@ def get_pcam_generators(base_dir, train_batch_size=32, val_batch_size=32):
 
 def convolutional_block(input, kernel_size=(3,3), first_filters=32):
       x = Conv2D(first_filters, kernel_size, padding = 'same')(input)
-      x = BatchNormalization()(x)
-      return x
+      output = BatchNormalization()(x)
+      return output
+
+def inverted_residual_block(input, expand=64, squeeze=16):
+    m = Conv2D(expand, (1,1), activation='relu')(input)
+    m = DepthwiseConv2D((3,3), activation='relu')(m)
+    output = Conv2D(squeeze, (1,1), activation='relu')(m)
+    return output
+
 
 
 def transformer_block(x, embed_dim, num_heads=8, ff_dim=256, dropout_rate=0.1): 
@@ -73,22 +80,29 @@ def transformer_block(x, embed_dim, num_heads=8, ff_dim=256, dropout_rate=0.1):
     ])(x)
     ffn_output = Dropout(dropout_rate)(ffn_output) # dropout for generalization
 
-    return LayerNormalization(epsilon=1e-6)(x + ffn_output)
+    output=LayerNormalization(epsilon=1e-6)(x + ffn_output)
+
+    return output
 
 
-def CoAtNet(input_shape, num_classes=1):
+def CoAtNet(input_shape, 
+            MBConv1_expand=64, MBConv1_squeeze=16, 
+            MBConv2_expand=32, MBConv2_squeeze=8, 
+            num_heads1=4, num_heads2=4, 
+            num_classes=1):
+    
     inputs = Input(shape=input_shape)
     
     # 2x CNN block
-    x = convolutional_block(inputs, 32) 
-    x = convolutional_block(x, 64)
+    x = inverted_residual_block(inputs, MBConv1_expand, MBConv1_squeeze) 
+    x = inverted_residual_block(x, MBConv2_expand , MBConv2_squeeze)
     
     # Automatic reshaping
     x = Reshape((-1, x.shape[-1]))(x)
 
     # 2x transformer block
-    x = transformer_block(x, embed_dim=64, num_heads=4)
-    x = transformer_block(x, embed_dim=64, num_heads=4)
+    x = transformer_block(x, embed_dim=MBConv2_squeeze, num_heads=num_heads1)
+    x = transformer_block(x, embed_dim=MBConv2_squeeze, num_heads=num_heads2)
     
     x = GlobalAveragePooling1D()(x)
     outputs = Dense(num_classes, activation="sigmoid")(x)
@@ -113,7 +127,7 @@ with open(model_filepath, 'w') as json_file:
 
 
 # get the data generators
-train_gen, val_gen = get_pcam_generators('Data')
+train_gen, val_gen = get_pcam_generators(dir+'/Data')
 
 
 # define the model checkpoint and Tensorboard callbacks
