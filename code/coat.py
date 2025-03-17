@@ -9,7 +9,6 @@ from tensorflow.keras.layers import (Input, Conv2D, Dense, Flatten, GlobalAverag
                                      GlobalAveragePooling1D, BatchNormalization, Reshape, 
                                      MultiHeadAttention, LayerNormalization, Dropout, Concatenate)
 from tensorflow.keras.models import Model
-<<<<<<< HEAD
 from tensorflow.keras.layers import Dense, Flatten
 from tensorflow.keras.layers import Conv2D, MaxPool2D, GlobalAveragePooling1D, DepthwiseConv2D
 from tensorflow.keras.layers import Input
@@ -20,8 +19,6 @@ from tensorflow.keras.layers import LayerNormalization
 from tensorflow.keras.layers import BatchNormalization
 from tensorflow.keras.layers import MultiHeadAttention
 from tensorflow.keras.layers import Reshape
-=======
->>>>>>> 219087665b6860912ac11b24bccd89918d307db0
 from tensorflow.keras.optimizers import SGD
 from tensorflow.keras.callbacks import ModelCheckpoint, TensorBoard
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
