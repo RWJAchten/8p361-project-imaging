@@ -3,9 +3,13 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # or any {'0', '1', '2'}
 import tensorflow as tf
 
 import numpy as np
-
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
+import os
+import tensorflow as tf
+from tensorflow.keras.layers import (Input, Conv2D, Dense, Flatten, GlobalAveragePooling2D, 
+                                     GlobalAveragePooling1D, BatchNormalization, Reshape, 
+                                     MultiHeadAttention, LayerNormalization, Dropout, Concatenate)
 from tensorflow.keras.models import Model
+<<<<<<< HEAD
 from tensorflow.keras.layers import Dense, Flatten
 from tensorflow.keras.layers import Conv2D, MaxPool2D, GlobalAveragePooling1D, DepthwiseConv2D
 from tensorflow.keras.layers import Input
@@ -16,8 +20,11 @@ from tensorflow.keras.layers import LayerNormalization
 from tensorflow.keras.layers import BatchNormalization
 from tensorflow.keras.layers import MultiHeadAttention
 from tensorflow.keras.layers import Reshape
+=======
+>>>>>>> 219087665b6860912ac11b24bccd89918d307db0
 from tensorflow.keras.optimizers import SGD
 from tensorflow.keras.callbacks import ModelCheckpoint, TensorBoard
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 
 IMAGE_SIZE = 96
@@ -62,11 +69,12 @@ def inverted_residual_block(input, expand=64, squeeze=16):
 
 
 
-def transformer_block(x, embed_dim, num_heads=8, ff_dim=256, dropout_rate=0.1): 
+def transformer_block(x, embed_dim, num_heads=8, ff_dim=256, dropout_rate=0.1):
     # Pre-normalization
-    x = LayerNormalization(epsilon=1e-6)(x)
-
-    # Multi-head attention layer
+    x = LayerNormalization(epsilon = 1e-6)(x) #Nienke
+    x = Dense(embed_dim)(x)
+    
+    #Multi-head attention layer
     attn_output = MultiHeadAttention(num_heads=num_heads, key_dim=embed_dim)(x, x)
     attn_output = Dropout(dropout_rate)(attn_output) # dropout to prevent overfitting
 
@@ -97,9 +105,8 @@ def CoAtNet(input_shape,
     x = inverted_residual_block(inputs, MBConv1_expand, MBConv1_squeeze) 
     x = inverted_residual_block(x, MBConv2_expand , MBConv2_squeeze)
     
-    # Automatic reshaping
-    x = Reshape((-1, x.shape[-1]))(x)
-
+   # Automatic reshaping
+    x = Reshape((-1, x.shape[-1]))(x)  
     # 2x transformer block
     x = transformer_block(x, embed_dim=MBConv2_squeeze, num_heads=num_heads1)
     x = transformer_block(x, embed_dim=MBConv2_squeeze, num_heads=num_heads2)
@@ -109,6 +116,42 @@ def CoAtNet(input_shape,
     
     return Model(inputs, outputs)
 
+def convolutional_block_hybrid(x, filters):
+    x = Conv2D(filters, (3, 3), padding="same", activation="relu")(x)
+    x = BatchNormalization()(x)
+    x = Conv2D(filters, (3, 3), padding="same", activation="relu")(x)
+    x = BatchNormalization()(x)
+    x = GlobalAveragePooling2D()(x)  # Samenvatten van ruimtelijke info
+    return x
+
+def transformer_block_hybrid(x, embed_dim=64, num_heads=4):
+    x = LayerNormalization(epsilon=1e-6)(x)
+    x = Dense(embed_dim)(x)
+    
+    attn_output = MultiHeadAttention(num_heads=num_heads, key_dim=embed_dim)(x, x)
+    x = LayerNormalization(epsilon=1e-6)(x + attn_output)
+
+    return x
+
+def Parallel_CoAtNet(input_shape, num_classes=2):
+    inputs = Input(shape=input_shape)
+
+    # **CNN-pad**
+    cnn_branch = convolutional_block_hybrid(inputs, 64)
+
+    # **Transformer-pad**
+    transformer_input = Reshape((input_shape[0] * input_shape[1], input_shape[2]))(inputs)
+    transformer_branch = transformer_block_hybrid(transformer_input, embed_dim=64)
+
+    # **Padding Aligning for Concatenation**
+    transformer_branch = GlobalAveragePooling1D()(transformer_branch)
+    # **Samenvoegen van beide paden**
+    merged = Concatenate()([cnn_branch, transformer_branch])
+
+    # **Eindklasse**
+    outputs = Dense(1, activation="sigmoid")(merged)
+
+    return Model(inputs, outputs)
 
 # get the model
 input_shape = (IMAGE_SIZE, IMAGE_SIZE, 3)
