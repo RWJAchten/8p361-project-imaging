@@ -189,10 +189,13 @@ history = model.fit(train_gen, steps_per_epoch=train_steps,
 # evaluation metrics
 from sklearn.metrics import accuracy_score, recall_score
 y_pred_prob = model.predict(val_gen)  # Returns a probability per image
+# Zet de voorspelde waarschijnlijkheden om naar binaire labels (0 of 1)
+y_pred = (y_pred_prob > 0.5).astype(int)  # Binaire voorspelling op basis van 0.5 drempel
+
 y_true = val_gen.classes  # The real labels (0 or 1) from the validation set
 
-accuracy = accuracy_score(y_true, y_pred_prob)
-recall = recall_score(y_true, y_pred_prob, average='binary') 
+accuracy = accuracy_score(y_true, y_pred)
+recall = recall_score(y_true, y_pred, average='binary') 
 
 print(f'Accuracy: {accuracy:.4f}')
 print(f'Recall: {recall:.4f}')
