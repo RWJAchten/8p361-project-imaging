@@ -65,7 +65,6 @@ def inverted_residual_block(input, expand=64, squeeze=16):
     return output
 
 
-
 def transformer_block(x, embed_dim, num_heads=8, ff_dim=256, dropout_rate=0.1):
     # Pre-normalization
     x = LayerNormalization(epsilon = 1e-6)(x) #Nienke
@@ -185,3 +184,6 @@ history = model.fit(train_gen, steps_per_epoch=train_steps,
                     validation_steps=val_steps,
                     epochs=3,
                     callbacks=callbacks_list)
+
+
+# evaluation metrics
