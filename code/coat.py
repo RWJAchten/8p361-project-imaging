@@ -120,7 +120,7 @@ def convolutional_block_hybrid(x, filters):
     x = GlobalAveragePooling2D()(x)  # Samenvatten van ruimtelijke info
     return x
 
-def transformer_block_hybrid(x, embed_dim=64, num_heads=4):
+#def transformer_block_hybrid(x, embed_dim=64, num_heads=4):
     x = LayerNormalization(epsilon=1e-6)(x)
     x = Dense(embed_dim)(x)
     
@@ -137,7 +137,7 @@ def Parallel_CoAtNet(input_shape, num_classes=2):
 
     # **Transformer-pad**
     transformer_input = Reshape((input_shape[0] * input_shape[1], input_shape[2]))(inputs)
-    transformer_branch = transformer_block_hybrid(transformer_input, embed_dim=64)
+    transformer_branch = transformer_block(transformer_input, embed_dim=64)
 
     # **Padding Aligning for Concatenation**
     transformer_branch = GlobalAveragePooling1D()(transformer_branch)
@@ -187,3 +187,12 @@ history = model.fit(train_gen, steps_per_epoch=train_steps,
 
 
 # evaluation metrics
+from sklearn.metrics import accuracy_score, recall_score
+y_pred_prob = model.predict(val_gen)  # Returns a probability per image
+y_true = val_gen.classes  # The real labels (0 or 1) from the validation set
+
+accuracy = accuracy_score(y_true, y_pred_prob)
+recall = recall_score(y_true, y_pred_prob, average='binary') 
+
+print(f'Accuracy: {accuracy:.4f}')
+print(f'Recall: {recall:.4f}')
