@@ -107,3 +107,6 @@ venv.bak/
 Data/
 
 CoAtNetTest/
+
+metadata/
+logs/
