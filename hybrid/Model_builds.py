@@ -85,7 +85,7 @@ def Vision_transformer_double(embed_dim1=254, embed_dim2=508, input_shape=(96,96
 
 def Hybrid_single(input_shape=(96,96,3),
         output_dim_cnn=(48,48,8), expansion_factor=4,
-        embed_dim=254, num_heads=4, dropout_rate=0.1, 
+        embed_dim=256, num_heads=8, dropout_rate=0.2, 
         num_classes=1, feed_forward_factor=2, patch_size=False, MLP_depth=2048):
     """
     Hybrid consisting of MBConv block and ViT block (classified by MLP)
@@ -102,6 +102,8 @@ def Hybrid_single(input_shape=(96,96,3),
         batch, height, width, channel = x.shape
         x = Reshape((height*width, channel))(x)
 
+    # 2 layers
+    x = transformer_block(x, embed_dim, num_heads, dropout_rate, feed_forward_factor)
     x = transformer_block(x, embed_dim, num_heads, dropout_rate, feed_forward_factor)
 
     mlp_head = Multi_Layer_Perceptron(num_classes, depth=MLP_depth)
@@ -114,8 +116,8 @@ def Hybrid_single(input_shape=(96,96,3),
 
 def Hybrid_double(input_shape=(96,96,3),
         output_dim_cnn1=(48,48,8), output_dim_cnn2=(24,24,16), expansion_factor=4,
-        embed_dim1=254, embed_dim2=508, num_heads=4, dropout_rate=0.1, 
-        num_classes=1, feed_forward_factor=2, patch_size=False, MLP_depth=2048):
+        embed_dim1=256, embed_dim2=512, num_heads=8, dropout_rate=0.2, 
+        num_classes=1, feed_forward_factor=4, patch_size=False, MLP_depth=2048):
     """
     Hybrid consisting of two MBConv blocks, followed by two transformer blocks.
     """

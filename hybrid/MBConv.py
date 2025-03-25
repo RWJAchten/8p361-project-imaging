@@ -14,7 +14,7 @@ def inverted_residual_block(input, output_dim, expansion_factor=4):
     (strx,stry)=(height//outheight,width//outwidth)
 
     # expand with expand*amount of channels and reduce dimensions with stride
-    m = Conv2D(filters=expansion_factor*channel, kernel_size=(3,3), strides=(strx,stry), activation=None, padding='same')(input)
+    m = Conv2D(filters=expansion_factor*outchannel, kernel_size=(3,3), strides=(strx,stry), activation=None, padding='same')(input)
 
     # perform depthwise convolution
     m = DepthwiseConv2D((3,3), activation=None, padding='same', use_bias=False)(m)

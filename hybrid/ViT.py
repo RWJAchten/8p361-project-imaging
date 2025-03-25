@@ -11,7 +11,6 @@ from tensorflow.keras.layers import Dense
 from tensorflow.keras.layers import Dropout
 from tensorflow.keras.layers import LayerNormalization
 from tensorflow.keras.layers import MultiHeadAttention
-from tensorflow.keras.layers import Reshape
 
 
 def patch_embedding(x, patch_size, embed_dim):
@@ -50,7 +49,7 @@ def transformer_block(x, embed_dim, num_heads=4, dropout_rate=0.1, feed_forward_
     # Post-normalization
     x = LayerNormalization(epsilon=1e-6)(x + attn_output)  
  
-    # Feed-forward network (Multi Layer Perceptron)
+    # Feed-forward network 
     x = Dense(ff_dim, activation="gelu")(x), # expands feature dimension and introduces non-linearity (to recognize complex patterns)
     x = Dropout(dropout_rate)(x) # dropout for generalization
   
