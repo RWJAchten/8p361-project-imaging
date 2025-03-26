@@ -102,8 +102,6 @@ def Hybrid_single(input_shape=(96,96,3),
         batch, height, width, channel = x.shape
         x = Reshape((height*width, channel))(x)
 
-    # 2 layers
-    x = transformer_block(x, embed_dim, num_heads, dropout_rate, feed_forward_factor)
     x = transformer_block(x, embed_dim, num_heads, dropout_rate, feed_forward_factor)
 
     mlp_head = Multi_Layer_Perceptron(num_classes, depth=MLP_depth)
