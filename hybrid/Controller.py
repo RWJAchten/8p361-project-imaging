@@ -62,7 +62,7 @@ def model_preparation(model,model_name,dir,learning_rate=0.0005):
     tensorboard = TensorBoard(os.path.join('logs', model_name))
     callbacks_list = [checkpoint, tensorboard]
     
-    return model,callbacks_list
+    return model, callbacks_list, weights_filepath
 
 def train_model(model, train_gen,val_gen,epochs,callbacks_list):
     """
@@ -72,9 +72,6 @@ def train_model(model, train_gen,val_gen,epochs,callbacks_list):
     # not used during training
     train_steps = train_gen.n//train_gen.batch_size
     val_steps = val_gen.n//val_gen.batch_size
-
-     # Voeg de ROC Callback toe aan de lijst van callbacks
-    callbacks_list.append(ROCCallback(val_gen))
 
     os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
     history = model.fit(train_gen, steps_per_epoch=train_steps,

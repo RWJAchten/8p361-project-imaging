@@ -3,6 +3,7 @@ from ViT import *
 from MBConv import *
 from tensorflow.keras.layers import Conv1D
 from tensorflow.keras.layers import Conv2D, GlobalAveragePooling2D
+import tensorflow as tf
 
 
 #============================================ Simple 1 layer vision transformer ==============================
@@ -20,8 +21,9 @@ def Vision_transformer_single(embed_dim=254, input_shape=(96,96,3),
     if patch_size != False:
         x = patch_embedding(inputs, patch_size, embed_dim)
     else:
-        batch, height, width, channel = x.shape
-        x = Reshape((height*width, channel))(x)
+        shape = tf.shape(x)
+        batch, height, width, channel = shape[0], shape[1], shape[2], shape[3]
+        x = tf.reshape(x, (batch, height * width, channel)) 
 
     x = transformer_block(x, embed_dim, num_heads, dropout_rate, feed_forward_factor)
 
@@ -65,8 +67,9 @@ def Vision_transformer_double(embed_dim1=254, embed_dim2=508, input_shape=(96,96
     if patch_size != False:
         x = patch_embedding(inputs, patch_size, embed_dim1)
     else:
-        batch, height, width, channel = x.shape
-        x = Reshape((height*width, channel))(x)
+        shape = tf.shape(x)
+        batch, height, width, channel = shape[0], shape[1], shape[2], shape[3]
+        x = tf.reshape(x, (batch, height * width, channel)) 
 
     x = transformer_block(x, embed_dim1, num_heads, dropout_rate, feed_forward_factor)
 
@@ -99,8 +102,9 @@ def Hybrid_single(input_shape=(96,96,3),
     if patch_size != False:
         x = patch_embedding(x, patch_size, embed_dim)
     else:
-        batch, height, width, channel = x.shape
-        x = Reshape((height*width, channel))(x)
+        shape = tf.shape(x)
+        batch, height, width, channel = shape[0], shape[1], shape[2], shape[3]
+        x = tf.reshape(x, (batch, height * width, channel)) 
 
     x = transformer_block(x, embed_dim, num_heads, dropout_rate, feed_forward_factor)
 
@@ -130,8 +134,9 @@ def Hybrid_double(input_shape=(96,96,3),
     if patch_size != False:
         x = patch_embedding(x, patch_size, embed_dim1)
     else:
-        batch, height, width, channel = x.shape
-        x = Reshape((height*width, channel))(x)
+        shape = tf.shape(x)
+        batch, height, width, channel = shape[0], shape[1], shape[2], shape[3]
+        x = tf.reshape(x, (batch, height * width, channel)) 
 
     x = transformer_block(x, embed_dim1, num_heads, dropout_rate, feed_forward_factor)
 
