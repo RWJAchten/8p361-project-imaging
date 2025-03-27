@@ -8,6 +8,8 @@ from tensorflow.keras.callbacks import ModelCheckpoint, TensorBoard
 import tensorflow as tf
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import recall_score
+import numpy as np
+import matplotlib.pyplot as plt
 from sklearn.metrics import roc_curve, auc
 
 IMAGE_SIZE=96
@@ -94,3 +96,71 @@ def evaluate_model(model, val_gen):
 
     
     return accuracy, recall, area_under_curve, recall
+
+def plot_roc_curve(y_true, y_pred_prob):
+    """
+    This function computes the ROC curve and plots it.
+
+    Parameters:
+    - y_true: The true labels (0 or 1) of the dataset.
+    - y_pred_prob: The predicted probabilities for each image.
+
+    Returns:
+    - The AUC (Area Under Curve) score.
+    """
+    # Compute the ROC curve
+    fpr, tpr, thresholds = roc_curve(y_true, y_pred_prob)
+    
+    # Compute the AUC
+    roc_auc = auc(fpr, tpr)
+    
+    # Plot the ROC curve
+    plt.figure()
+    plt.plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
+    plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title('Receiver Operating Characteristic')
+    plt.legend(loc="lower right")
+    plt.show()
+    
+    # Return the AUC value
+    return roc_auc
+
+def evaluate_model_from_file(model_file_path, val_gen):
+    
+    model=tf.keras.models.load_model(model_file_path)
+    steps = val_gen.samples // val_gen.batch_size  
+    loss, accuracy, area_under_curve, recall = model.evaluate(val_gen, steps=steps)
+
+    print(f'loss: {loss:.4f}')
+    print(f'accuracy: {accuracy:.4f}')
+    print(f'AUC: {area_under_curve:.4f}')
+    print(f'Recall: {recall:.4f}')
+
+    # Initialize counters
+    num_batches = 500
+    predictions = []
+    true = []
+
+    # Iterate through the first 20 batches of the data generator
+    for i, (batch_data, batch_labels) in enumerate(val_gen):
+        if i >= num_batches:
+            break  # Stop after 20 batches
+    
+    # Perform prediction on the batch
+    batch_predictions = model.predict(batch_data)  # You can also use model(batch_data, training=False)
+    
+    # Store predictions for later analysis (optional)
+    predictions.append(batch_predictions)
+    true.append(batch_labels)
+
+    # After the loop, you can convert the predictions list into a single array (optional)
+    predictions = np.concatenate(predictions, axis=0)
+    true = np.concatenate(true, axis=0)
+
+    plot_roc_curve(true, predictions)
+
+    return loss, accuracy, area_under_curve, recall
