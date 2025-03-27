@@ -11,6 +11,7 @@ from sklearn.metrics import recall_score
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.metrics import roc_curve, auc
+import matplotlib.pyplot as plt
 
 IMAGE_SIZE=96
 
@@ -50,7 +51,7 @@ def model_preparation(model,model_name,dir,learning_rate=0.0005):
  
     # save the model and weights
     model_filepath = dir+'/metadata/'+model_name + '.json'
-    weights_filepath = dir+'/metadata/'+model_name + '_weights.keras'
+    weights_filepath = dir+'/metadata/'+model_name + '_weights.hdf5' #'_weights.keras'
 
     model_json = model.to_json() # serialize model to JSON
     with open(model_filepath, 'w') as json_file:
@@ -71,6 +72,9 @@ def train_model(model, train_gen,val_gen,epochs,callbacks_list):
     # not used during training
     train_steps = train_gen.n//train_gen.batch_size
     val_steps = val_gen.n//val_gen.batch_size
+
+     # Voeg de ROC Callback toe aan de lijst van callbacks
+    callbacks_list.append(ROCCallback(val_gen))
 
     os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = 'true'
     history = model.fit(train_gen, steps_per_epoch=train_steps,
