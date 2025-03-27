@@ -150,13 +150,13 @@ def evaluate_model_from_file(model_file_path, val_gen):
     for i, (batch_data, batch_labels) in enumerate(val_gen):
         if i >= num_batches:
             break  # Stop after 20 batches
+        print('working on batch', i, '/', num_batches)
+        # Perform prediction on the batch
+        batch_predictions = model.predict(batch_data)  # You can also use model(batch_data, training=False)
     
-    # Perform prediction on the batch
-    batch_predictions = model.predict(batch_data)  # You can also use model(batch_data, training=False)
-    
-    # Store predictions for later analysis (optional)
-    predictions.append(batch_predictions)
-    true.append(batch_labels)
+        # Store predictions for later analysis (optional)
+        predictions.append(batch_predictions)
+        true.append(batch_labels)
 
     # After the loop, you can convert the predictions list into a single array (optional)
     predictions = np.concatenate(predictions, axis=0)
