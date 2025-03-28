@@ -165,3 +165,33 @@ def evaluate_model_from_file(model_file_path, val_gen):
     plot_roc_curve(true, predictions)
 
     return loss, accuracy, area_under_curve, recall
+
+def plot_history(history, title='Training History'):
+    plt.figure(figsize=(12, 5))
+
+    # Accuracy
+    plt.subplot(1, 2, 1)
+    plt.plot(history.history['accuracy'], label='Train Accuracy')
+    plt.plot(history.history['val_accuracy'], label='Val Accuracy')
+    plt.title(f'{title} - Accuracy')
+    plt.xlabel('Epochs')
+    plt.ylabel('Accuracy')
+    plt.legend()
+
+    # Loss
+    plt.subplot(1, 2, 2)
+    plt.plot(history.history['loss'], label='Train Loss')
+    plt.plot(history.history['val_loss'], label='Val Loss')
+    plt.title(f'{title} - Loss')
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
+    plt.legend()
+
+    # Recall
+
+
+    # AUC
+
+
+
+    plt.show()
