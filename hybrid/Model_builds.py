@@ -8,7 +8,7 @@ import tensorflow as tf
 
 #============================================ Simple 1 layer vision transformer ==============================
     
-def Vision_transformer_single(embed_dim=254, input_shape=(96,96,3), 
+def Vision_transformer_single(embed_dim=256, input_shape=(96,96,3), 
                        num_heads=4, dropout_rate=0.1, num_classes=1, feed_forward_factor=2, patch_size=False, MLP_depth=2048):
     """
     Simple vision transformer network with 1 layer. First patches are created (unless patch_size=False), then the patches
@@ -54,8 +54,8 @@ def CNN_double(input_shape=(96,96,3), output_dim1=(48,48,8), output_dim2=(24,24,
 
 #============================================ 2 layer ViT ==========================================
 
-def Vision_transformer_double(embed_dim1=254, embed_dim2=508, input_shape=(96,96,3), 
-                       num_heads=4, dropout_rate=0.1, num_classes=1, feed_forward_factor=2, patch_size=False, MLP_depth=2048):
+def Vision_transformer_double(embed_dim1=64, embed_dim2=128, input_shape=(96,96,3), 
+                       num_heads=4, dropout_rate=0.2, num_classes=1, feed_forward_factor=2, patch_size=False, MLP_depth=2048):
     """
     Two layer vision transformer. In between transformer blocks the dimensions are reduced by a factor 2, while
     the amount of channels is kept the same.
@@ -73,10 +73,16 @@ def Vision_transformer_double(embed_dim1=254, embed_dim2=508, input_shape=(96,96
 
     x = transformer_block(x, embed_dim1, num_heads, dropout_rate, feed_forward_factor)
 
-    # convolution in between layers to reduce dimensions by factor 2.
+    # Convolution in between layers to reduce dimensions by factor 4
     x = Conv1D(filters=embed_dim1, kernel_size=3, strides=2, padding='same')(x)
+    x = LayerNormalization(epsilon=1e-6)(x)
 
+    # Project embedding dimension to match embed_dim2
+    x = Dense(embed_dim2)(x)
+
+    # Second transformer block
     x = transformer_block(x, embed_dim2, num_heads, dropout_rate, feed_forward_factor)
+
 
     mlp_head = Multi_Layer_Perceptron(num_classes, depth=MLP_depth)
     
@@ -88,7 +94,7 @@ def Vision_transformer_double(embed_dim1=254, embed_dim2=508, input_shape=(96,96
 
 def Hybrid_single(input_shape=(96,96,3),
         output_dim_cnn=(48,48,8), expansion_factor=4,
-        embed_dim=256, num_heads=8, dropout_rate=0.2, 
+        embed_dim=64, num_heads=4, dropout_rate=0.2, 
         num_classes=1, feed_forward_factor=2, patch_size=False, MLP_depth=2048):
     """
     Hybrid consisting of MBConv block and ViT block (classified by MLP)
@@ -118,8 +124,8 @@ def Hybrid_single(input_shape=(96,96,3),
 
 def Hybrid_double(input_shape=(96,96,3),
         output_dim_cnn1=(48,48,8), output_dim_cnn2=(24,24,16), expansion_factor=4,
-        embed_dim1=256, embed_dim2=512, num_heads=8, dropout_rate=0.2, 
-        num_classes=1, feed_forward_factor=4, patch_size=False, MLP_depth=2048):
+        embed_dim1=64, embed_dim2=128, num_heads=4, dropout_rate=0.2, 
+        num_classes=1, feed_forward_factor=2, patch_size=False, MLP_depth=2048):
     """
     Hybrid consisting of two MBConv blocks, followed by two transformer blocks.
     """
@@ -140,7 +146,12 @@ def Hybrid_double(input_shape=(96,96,3),
 
     x = transformer_block(x, embed_dim1, num_heads, dropout_rate, feed_forward_factor)
 
+    # Convolution in between layers to reduce dimensions by factor 2
     x = Conv1D(filters=embed_dim1, kernel_size=3, strides=2, padding='same')(x)
+    x = LayerNormalization(epsilon=1e-6)(x)
+
+    # Project embedding dimension to match embed_dim2
+    x = Dense(embed_dim2)(x)
 
     x = transformer_block(x, embed_dim2, num_heads, dropout_rate, feed_forward_factor)
 
