@@ -2,10 +2,17 @@
 import tensorflow as tf
 from tensorflow.keras.layers import Conv2D, DepthwiseConv2D
 from tensorflow.keras.layers import BatchNormalization 
-from tensorflow.keras.layers import Input
-from tensorflow.keras.models import Model
 
 def inverted_residual_block(input, output_dim, expansion_factor=4):
+    """
+    Inverted Residual Block with depthwise separable convolution.
+    Args:
+            input: Input tensor.
+            output_dim: Desired output dimensions (height, width, channels).
+            expansion_factor: Factor by which to expand the number of channels.
+    output:
+            output: Output tensor after applying the inverted residual block.
+    """
 
     batch, height, width, channel = input.shape
 
