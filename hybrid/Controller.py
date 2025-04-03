@@ -166,6 +166,60 @@ def evaluate_model_from_file(model_file_path, val_gen):
 
     return loss, accuracy, area_under_curve, recall
 
+def evaluate_models_from_files(model_file_paths, val_gen, model_names=None):
+    plt.figure(figsize=(8, 6))  # Maak een figuur voor de ROC-curve
+
+    # Als model_names niet is opgegeven, gebruik dan de bestandsnamen zonder extensie
+    if model_names is None:
+        import os
+        model_names = [os.path.basename(path).replace(".h5", "").replace("_", " ") for path in model_file_paths]
+
+    for model_file_path, model_name in zip(model_file_paths, model_names):
+        print(f"Evaluating model: {model_name}")
+        model = tf.keras.models.load_model(model_file_path)
+        steps = val_gen.samples // val_gen.batch_size
+        loss, accuracy, area_under_curve, recall = model.evaluate(val_gen, steps=steps)
+
+        print(f'Loss: {loss:.4f}')
+        print(f'Accuracy: {accuracy:.4f}')
+        print(f'AUC: {area_under_curve:.4f}')
+        print(f'Recall: {recall:.4f}')
+
+        # Initialiseer lijsten voor voorspellingen en ware labels
+        predictions, true_labels = [], []
+        num_batches = 500  # Aantal batches om te verwerken
+
+        for i, (batch_data, batch_labels) in enumerate(val_gen):
+            if i >= num_batches:
+                break  # Stop na het ingestelde aantal batches
+            print(f'Processing batch {i+1}/{num_batches}')
+            batch_predictions = model.predict(batch_data)
+            predictions.append(batch_predictions)
+            true_labels.append(batch_labels)
+
+        # Zet lijsten om in numpy arrays
+        predictions = np.concatenate(predictions, axis=0)
+        true_labels = np.concatenate(true_labels, axis=0)
+
+        # ROC-curve berekenen
+        fpr, tpr, _ = roc_curve(true_labels.ravel(), predictions.ravel())
+        roc_auc = auc(fpr, tpr)
+
+        # Plot de ROC-curve met de aangepaste naam
+        plt.plot(fpr, tpr, label=f"{model_name} (AUC = {roc_auc:.2f})")
+
+    # ROC-plot instellen
+    plt.plot([0, 1], [0, 1], 'k--', label='AUC = 0.5')
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title('ROC Curve for Multiple Models')
+    plt.legend(loc="lower right")
+    plt.show()
+    
+    return loss, accuracy, area_under_curve, recall
+
 def plot_history(history, title='Training History'):
     plt.figure(figsize=(12, 5))
 
