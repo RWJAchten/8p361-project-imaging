@@ -214,9 +214,21 @@ def evaluate_model_from_file(model_file_path, val_gen):
     return loss, accuracy, area_under_curve, recall
 
 def evaluate_models_from_files(model_file_paths, val_gen, model_names=None):
-    plt.figure(figsize=(8, 6))  # Maak een figuur voor de ROC-curve
+    """	
+        Evaluate multiple trained models on the validation set by using the saved weights. Outputs relevant metrics and plots the ROC curve.
+        Args:
+            model_file_paths (list): A list of paths to the saved model files (.h5 or .keras).
+            val_gen: The validation data generator.
+            model_names (list): A list of names for the models. If None, uses the filenames without extensions.
+        Output:
+            loss (float): The loss of the model on the validation set.
+            accuracy (float): The accuracy of the model on the validation set.
+            area_under_curve (float): The AUC of the model on the validation set.
+            recall (float): The recall of the model on the validation set.
+        """
+    plt.figure(figsize=(8, 6))  # Initialize figure for plots
 
-    # Als model_names niet is opgegeven, gebruik dan de bestandsnamen zonder extensie
+    # If model_names is not provided, use the filenames without extensions
     if model_names is None:
         import os
         model_names = [os.path.basename(path).replace(".h5", "").replace("_", " ") for path in model_file_paths]
@@ -232,30 +244,30 @@ def evaluate_models_from_files(model_file_paths, val_gen, model_names=None):
         print(f'AUC: {area_under_curve:.4f}')
         print(f'Recall: {recall:.4f}')
 
-        # Initialiseer lijsten voor voorspellingen en ware labels
+        # Initialize lists for predictions and true labels
         predictions, true_labels = [], []
-        num_batches = 500  # Aantal batches om te verwerken
+        num_batches = 500  # Number of batches to process
 
         for i, (batch_data, batch_labels) in enumerate(val_gen):
             if i >= num_batches:
-                break  # Stop na het ingestelde aantal batches
+                break  # Stop after the specified number of batches
             print(f'Processing batch {i+1}/{num_batches}')
             batch_predictions = model.predict(batch_data)
             predictions.append(batch_predictions)
             true_labels.append(batch_labels)
 
-        # Zet lijsten om in numpy arrays
+        # Convert lists to numpy arrays
         predictions = np.concatenate(predictions, axis=0)
         true_labels = np.concatenate(true_labels, axis=0)
 
-        # ROC-curve berekenen
+        # Compute the ROC curve
         fpr, tpr, _ = roc_curve(true_labels.ravel(), predictions.ravel())
         roc_auc = auc(fpr, tpr)
 
-        # Plot de ROC-curve met de aangepaste naam
+        # Plot the ROC curve with the adjusted name
         plt.plot(fpr, tpr, label=f"{model_name} (AUC = {roc_auc:.2f})")
 
-    # ROC-plot instellen
+    # Set up the ROC plot
     plt.plot([0, 1], [0, 1], 'k--', label='AUC = 0.5')
     plt.xlim([0.0, 1.0])
     plt.ylim([0.0, 1.05])
@@ -264,7 +276,7 @@ def evaluate_models_from_files(model_file_paths, val_gen, model_names=None):
     plt.title('ROC Curve for Multiple Models')
     plt.legend(loc="lower right")
     plt.show()
-    
+        
     return loss, accuracy, area_under_curve, recall
 
 def plot_history(history, title='Training History'):
